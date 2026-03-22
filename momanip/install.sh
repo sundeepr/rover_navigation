@@ -16,6 +16,14 @@ pip install -e ./lerobot
 if [ "$ARCH" = "aarch64" ]; then
     echo "Jetson (ARM64) detected — installing Jetson PyTorch..."
 
+    # Install libcusparseLt — required by the Jetson PyTorch wheel
+    sudo apt-get install -y libcusparselt0 libcusparselt-dev 2>/dev/null || \
+        echo "libcusparselt not found in apt, trying CUDA path..."
+
+    # Ensure CUDA libraries are on the path
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64:\$LD_LIBRARY_PATH" >> ~/.bashrc
+
     # JetPack 6.x — PyTorch 2.5.0 for Jetson Orin
     pip install --no-cache \
         https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.5.0a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl
