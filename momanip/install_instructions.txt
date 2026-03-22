@@ -6,4 +6,5 @@
    48  pip install -r ./momanip/requirements.txt 
    54  python momanip_navigation.py   --model lerobot/smolvla_base   --dry-run   --no-display
    55  pip install -e ./lerobot
-   56  pip install "transformers==4.57.3" "huggingface-hub>=0.34.2,<0.36.0" torch torchvision opencv-python flask scipy pillow pyserial numpy
+   pip install num2words
+	56  pip install "transformers==4.57.3" "huggingface-hub>=0.34.2,<0.36.0" torch torchvision opencv-python flask scipy pillow pyserial numpy
