@@ -20,9 +20,13 @@ if [ "$ARCH" = "aarch64" ]; then
     pip install --no-cache \
         https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.5.0a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl
 
-    # torchvision matching torch 2.5 for Jetson
-    pip install --no-cache \
-        https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torchvision-0.20.0a0+afc54cf-cp310-cp310-linux_aarch64.whl
+    # torchvision is not hosted by NVIDIA — build from source (matches torch 2.5 / torchvision 0.20)
+    echo "Building torchvision from source (this may take 10-20 minutes)..."
+    sudo apt-get install -y libjpeg-dev zlib1g-dev libpython3-dev libopenblas-dev libavcodec-dev libavformat-dev libswscale-dev
+    pip install --no-cache Pillow
+    git clone --branch v0.20.0 https://github.com/pytorch/vision.git /tmp/torchvision
+    cd /tmp/torchvision && python setup.py install && cd -
+    rm -rf /tmp/torchvision
 else
     echo "x86_64 detected — installing standard PyTorch with CUDA..."
     pip install torch==2.7.1 torchvision==0.22.1
