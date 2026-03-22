@@ -181,9 +181,9 @@ class VLAWaypointGenerator:
 
         try:
             if "smolvla" in self.model_name.lower():
-                # SmolVLA model
+                # SmolVLA model — load to CPU first to avoid GPU OOM during weight loading
                 from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy
-                self.model = SmolVLAPolicy.from_pretrained(self.model_name)
+                self.model = SmolVLAPolicy.from_pretrained(self.model_name, device="cpu")
                 self.model = self.model.to(self.device)
                 self.model.eval()
                 self.is_smolvla = True

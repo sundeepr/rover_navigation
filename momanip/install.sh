@@ -34,6 +34,9 @@ if [ "$ARCH" = "aarch64" ]; then
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${CUSPARSELT_DIR}:${LD_LIBRARY_PATH}
     echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${CUSPARSELT_DIR}:\$LD_LIBRARY_PATH" >> ~/.bashrc
 
+    # Jetson PyTorch wheel requires NumPy < 2
+    pip install "numpy<2"
+
     # JetPack 6.x — PyTorch 2.5.0 for Jetson Orin
     pip install --no-cache \
         https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.5.0a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl
