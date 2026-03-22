@@ -455,8 +455,8 @@ class BiLevelMotionPlanner:
     """
 
     # Roomba physical constraints
-    MAX_VELOCITY = 10  # mm/s (reduced for safety)
-    MIN_VELOCITY = -10  # mm/s
+    MAX_VELOCITY = 200  # mm/s
+    MIN_VELOCITY = -200  # mm/s
     MAX_TURN_RATE = 1.0  # rad/s (approximate)
     WHEEL_BASE = 235  # mm (approximate Roomba wheel separation)
 
