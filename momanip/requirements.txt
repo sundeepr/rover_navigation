@@ -1,12 +1,28 @@
 # MoManip Navigation Dependencies
 # Install lerobot first: pip install -e ./lerobot
-torch
-torchvision
+
+# Core ML
+torch==2.7.1
+torchvision==0.22.1
 transformers==4.57.3
 huggingface-hub>=0.34.2,<0.36.0
-opencv-python
-flask
-scipy
-pillow
-pyserial
-numpy
+accelerate==1.13.0
+diffusers==0.35.2
+safetensors==0.7.0
+einops==0.8.2
+datasets==4.1.1
+tokenizers==0.22.2
+
+# Vision
+opencv-python==4.13.0.92
+pillow==12.1.1
+
+# Navigation / planning
+scipy==1.17.1
+numpy==2.2.6
+
+# Web streaming
+flask==3.1.3
+
+# Roomba serial control
+pyserial==3.5
