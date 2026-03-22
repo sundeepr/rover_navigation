@@ -318,18 +318,16 @@ class VLAWaypointGenerator:
         waypoints = []
 
         # SmolVLA outputs 7-DOF arm actions: [x_lateral, y_depth, z_vertical, rx, ry, rz, gripper]
-        # action[1] = arm depth (reaching toward target) → forward navigation intent
-        # action[0] = arm lateral → turn intent
-        # Also enforce a minimum forward bias so robot always moves forward
+        # For red line lane following:
+        #   action[0] (lateral) → centering correction: if drifting left, steer right and vice versa
+        #   action[1] (depth)   → forward intent, always biased forward
         print(f"  [VLA raw] {[round(float(a), 3) for a in action[:6]]}")
-        forward_intent = max(float(action[1]) if len(action) > 1 else 0.0, 0.3)
-        turn_intent = float(action[0]) if len(action) > 0 else 0.0
+        forward_intent = 0.8  # Strong constant forward drive for lane following
+        turn_intent = float(action[0]) if len(action) > 0 else 0.0  # Lateral correction only
 
         # Scale intents to physical values
-        # Forward: -1 to 1 maps to -horizon to +horizon meters
-        # Turn: -1 to 1 maps to -pi/2 to +pi/2 radians
-        base_distance = forward_intent * horizon * 0.5  # Scale down for safety
-        base_turn = turn_intent * (math.pi / 8)  # Max ~22 degree turn (reduced for smoother steering)
+        base_distance = forward_intent * horizon * 0.5
+        base_turn = turn_intent * (math.pi / 10)  # Gentle centering correction (~18 deg max)
 
         # Generate waypoints along a curved path
         # This creates a smooth trajectory that respects the VLA intent
@@ -837,7 +835,7 @@ class MoManipNavigator:
         self.current_velocities = (0, 0)
 
         # Instruction
-        self.instruction = "navigate forward to the green ball"
+        self.instruction = "move forward staying centered between the red lines on the left and right sides"
 
         # Statistics
         self.stats = {
@@ -1468,7 +1466,7 @@ Examples:
                        help='VLA model name')
     parser.add_argument('--mock-vla', action='store_true',
                        help='Use mock VLA (no model loading)')
-    parser.add_argument('--instruction', default='navigate to the yellow box',
+    parser.add_argument('--instruction', default='move forward staying centered between the red lines on the left and right sides',
                        help='Navigation instruction')
     parser.add_argument('--port', default='/dev/ttyUSB0',
                        help='Roomba serial port')
