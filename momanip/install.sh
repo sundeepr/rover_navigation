@@ -16,13 +16,23 @@ pip install -e ./lerobot
 if [ "$ARCH" = "aarch64" ]; then
     echo "Jetson (ARM64) detected — installing Jetson PyTorch..."
 
-    # Install libcusparseLt — required by the Jetson PyTorch wheel
-    sudo apt-get install -y libcusparselt0 libcusparselt-dev 2>/dev/null || \
-        echo "libcusparselt not found in apt, trying CUDA path..."
+    # Locate libcusparseLt — required by the Jetson PyTorch wheel
+    CUSPARSELT=$(find /usr/local/cuda* /usr/lib/aarch64-linux-gnu -name "libcusparseLt.so*" 2>/dev/null | head -1)
+    if [ -n "$CUSPARSELT" ]; then
+        CUSPARSELT_DIR=$(dirname "$CUSPARSELT")
+        echo "Found libcusparseLt at $CUSPARSELT_DIR"
+    else
+        echo "libcusparseLt not found — installing from CUDA toolkit repo..."
+        # Try the versioned package name used in CUDA 12.x on Jetson
+        sudo apt-get install -y cuda-cusparselt-12-6 || \
+        sudo apt-get install -y cuda-cusparselt-12-2 || \
+        echo "WARNING: Could not install libcusparseLt — torch may fail to import"
+        CUSPARSELT_DIR=/usr/local/cuda/lib64
+    fi
 
     # Ensure CUDA libraries are on the path
-    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
-    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64:\$LD_LIBRARY_PATH" >> ~/.bashrc
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${CUSPARSELT_DIR}:${LD_LIBRARY_PATH}
+    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${CUSPARSELT_DIR}:\$LD_LIBRARY_PATH" >> ~/.bashrc
 
     # JetPack 6.x — PyTorch 2.5.0 for Jetson Orin
     pip install --no-cache \
