@@ -1468,7 +1468,7 @@ Examples:
                        help='VLA model name')
     parser.add_argument('--mock-vla', action='store_true',
                        help='Use mock VLA (no model loading)')
-    parser.add_argument('--instruction', default='navigate forward to the yellow box',
+    parser.add_argument('--instruction', default='navigate to the yellow box',
                        help='Navigation instruction')
     parser.add_argument('--port', default='/dev/ttyUSB0',
                        help='Roomba serial port')
@@ -1618,36 +1618,37 @@ Examples:
                 break
 
             if not paused:
-                # Process frame through MoManipVLA pipeline
+                # Step-based control: infer once, stop, execute for fixed duration, repeat
+                EXECUTE_DURATION = 0.5  # seconds to drive before re-inferring
+
+                # Stop Roomba before inference
+                if roomba and not args.dry_run:
+                    roomba.drive(0, 0x8000)
+
+                # Run VLA inference on current frame
                 left_vel, right_vel, debug_info = navigator.process_frame(
                     frame,
                     args.instruction
                 )
 
-                # Send to Roomba
-                # Convert differential drive (left_vel, right_vel) to (velocity, radius)
+                # Send to Roomba and drive for EXECUTE_DURATION seconds
                 if roomba and not args.dry_run:
                     velocity = (left_vel + right_vel) // 2
                     diff = right_vel - left_vel
                     if abs(diff) < 5:
-                        # Go straight
-                        radius = 0x8000  # Special value for straight
+                        radius = 0x8000  # Straight
                     elif abs(velocity) < 5:
-                        # Spin in place
                         radius = 1 if diff > 0 else -1
                         velocity = abs(diff) // 2
                     else:
-                        # Calculate turn radius from wheel velocities
-                        # radius = (L/2) * (v_r + v_l) / (v_r - v_l)
                         wheel_base = 235  # mm
                         radius = int(wheel_base * (right_vel + left_vel) / (2 * diff))
                         radius = max(-2000, min(2000, radius))
 
-                    # Debug: print command being sent
-                    if navigator.stats['frames_processed'] % 10 == 0:
-                        print(f"  -> Sending to Roomba: velocity={velocity}, radius={radius}")
-
+                    print(f"  -> Drive: velocity={velocity}, radius={radius} for {EXECUTE_DURATION}s")
                     roomba.drive(velocity, radius)
+                    time.sleep(EXECUTE_DURATION)
+                    roomba.drive(0, 0x8000)  # Stop after execution
                 elif not roomba:
                     if navigator.stats['frames_processed'] == 1:
                         print("WARNING: Roomba not connected! Commands not being sent.")
