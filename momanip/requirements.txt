@@ -2,8 +2,7 @@
 # Install lerobot first: pip install -e ./lerobot
 
 # Core ML
-torch==2.7.1
-torchvision==0.22.1
+# torch and torchvision are installed by install.sh (platform-specific)
 transformers==4.57.3
 huggingface-hub>=0.34.2,<0.36.0
 accelerate==1.13.0

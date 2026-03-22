@@ -205,7 +205,7 @@ class VLAWaypointGenerator:
                 )
                 self.model = AutoModelForVision2Seq.from_pretrained(
                     self.model_name,
-                    torch_dtype=torch.bfloat16 if self.device == "cuda" else torch.float32,
+                    torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
                     trust_remote_code=True,
                     attn_implementation="eager"
                 )
@@ -291,7 +291,7 @@ class VLAWaypointGenerator:
 
                 inputs = self.processor(prompt, pil_image).to(
                     self.device,
-                    dtype=torch.bfloat16 if self.device == "cuda" else torch.float32
+                    dtype=torch.float16 if self.device == "cuda" else torch.float32
                 )
 
                 action = self.model.predict_action(**inputs, do_sample=False)

@@ -6,26 +6,21 @@
 
 ## Steps
 
-### 1. Create a virtual environment
+Run the install script — it auto-detects x86 vs Jetson (ARM64) and installs the correct PyTorch:
+
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+chmod +x install.sh
+./install.sh
 ```
 
-### 2. Install lerobot (local source)
-```bash
-pip install -e ./lerobot
-```
-
-### 3. Install remaining dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Verify installation
-```bash
-python -c "from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy; print('OK')"
-```
+This will:
+1. Create a `.venv` virtual environment
+2. Install the platform-appropriate PyTorch:
+   - **x86_64**: `torch==2.7.1` from PyPI with CUDA
+   - **Jetson (aarch64)**: NVIDIA's Jetson PyTorch wheel for JetPack 6.x
+3. Install lerobot from local source
+4. Install all remaining dependencies
+5. Verify the installation and confirm GPU is available
 
 ## Running
 
