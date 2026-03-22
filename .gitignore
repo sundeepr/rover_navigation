@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.DS_Store
+models/
+*.mp4
+*.avi

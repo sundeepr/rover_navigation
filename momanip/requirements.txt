@@ -1,0 +1,12 @@
+# MoManip Navigation Dependencies
+# Install lerobot first: pip install -e ./lerobot
+torch
+torchvision
+transformers==4.57.3
+huggingface-hub>=0.34.2,<0.36.0
+opencv-python
+flask
+scipy
+pillow
+pyserial
+numpy
