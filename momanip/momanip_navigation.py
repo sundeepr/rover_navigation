@@ -329,7 +329,7 @@ class VLAWaypointGenerator:
         # Forward: -1 to 1 maps to -horizon to +horizon meters
         # Turn: -1 to 1 maps to -pi/2 to +pi/2 radians
         base_distance = forward_intent * horizon * 0.5  # Scale down for safety
-        base_turn = turn_intent * (math.pi / 3)  # Max 60 degree turn
+        base_turn = turn_intent * (math.pi / 8)  # Max ~22 degree turn (reduced for smoother steering)
 
         # Generate waypoints along a curved path
         # This creates a smooth trajectory that respects the VLA intent
