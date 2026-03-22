@@ -317,9 +317,13 @@ class VLAWaypointGenerator:
         """
         waypoints = []
 
-        # Interpret first two dimensions as primary direction
-        forward_intent = float(action[0]) if len(action) > 0 else 0.0
-        turn_intent = float(action[1]) if len(action) > 1 else 0.0
+        # SmolVLA outputs 7-DOF arm actions: [x_lateral, y_depth, z_vertical, rx, ry, rz, gripper]
+        # action[1] = arm depth (reaching toward target) → forward navigation intent
+        # action[0] = arm lateral → turn intent
+        # Also enforce a minimum forward bias so robot always moves forward
+        print(f"  [VLA raw] {[round(float(a), 3) for a in action[:6]]}")
+        forward_intent = max(float(action[1]) if len(action) > 1 else 0.0, 0.3)
+        turn_intent = float(action[0]) if len(action) > 0 else 0.0
 
         # Scale intents to physical values
         # Forward: -1 to 1 maps to -horizon to +horizon meters
